@@ -1,7 +1,7 @@
 ---
 name: User Story
 about: User Story to be developed into a feature
-title: 'Story: User Story'
+title: 'Story: '
 labels: enhancement
 assignees: ''
 
