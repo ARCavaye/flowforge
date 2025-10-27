@@ -1,0 +1,109 @@
+# Python/Django general
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
+
+# Django
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+# If you commit built static assets, remove or adjust the above static/ entries
+# static/
+
+# Environment, virtualenvs
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and runtime files
+*.log
+logs/
+celerybeat-schedule
+celerybeat.pid
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node/npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Docker
+docker-compose.override.yml
+*.pid
+*.pid.lock
+
+# Sphinx docs
+docs/_build/
+
+# Static analysis / typing
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Secret keys, certificates
+*.pem
+*.key
+*.crt
+
+# Editor swap/temp files
+*~
+*.swp
+*.swo
+
+# Misc
+coverage_html_report/
