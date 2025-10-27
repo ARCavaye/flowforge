@@ -35,7 +35,7 @@ class location(models.Model):
         blank=True, help_text="Detailed description of the location"
     )
     coordinates = models.CharField(
-        max_length=50, blank=True, help_text="GPS coordinates or map reference"
+        max_length=50, blank=True, help_text="GPS coordinates of the location"
     )
     terrainType = models.CharField(
         max_length=50,
