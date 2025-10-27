@@ -23,7 +23,7 @@
   "portsAttributes": {
     "8000": {
       "label": "Application",
-      "onAutoForward": "openBrowserOnce"
+      "onAutoForward": "notify"
     }
   },
   "forwardPorts": [8000]
