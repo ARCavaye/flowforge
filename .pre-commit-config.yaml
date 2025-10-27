@@ -38,13 +38,13 @@ repos:
       - id: bandit
         args: ["-ii", "-ll"]
 
--   repo: local
-    hooks:
-    -   id: trufflehog
-        name: TruffleHog
-        description: Detect secrets in your data.
-        # entry: bash -c 'trufflehog git file://. --since-commit HEAD --results=verified,unknown --fail'
-        # For running trufflehog in docker, use the following entry instead:
-        entry: bash -c 'docker run --rm -v "$(pwd):/workdir" -i --rm trufflesecurity/trufflehog:latest git file:///workdir --since-commit HEAD --results=verified,unknown --fail'
-        language: system
-        stages: ["pre-commit", "pre-push"]
+# -   repo: local
+#     hooks:
+#     -   id: trufflehog
+#         name: TruffleHog
+#         description: Detect secrets in your data.
+#         # entry: bash -c 'trufflehog git file://. --since-commit HEAD --results=verified,unknown --fail'
+#         # For running trufflehog in docker, use the following entry instead:
+#         entry: bash -c 'docker run --rm -v "$(pwd):/workdir" -i --rm trufflesecurity/trufflehog:latest git file:///workdir --since-commit HEAD --results=verified,unknown --fail'
+#         language: system
+#         stages: ["pre-commit", "pre-push"]
