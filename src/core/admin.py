@@ -162,6 +162,60 @@ class TeamMembershipAdmin(admin.ModelAdmin):
     role_permissions.short_description = "Permissions"
 
 
+class PlanSectionItemInline(admin.TabularInline):
+    model = models.PlanSectionItem
+    extra = 1
+    fields = ("item_type", "location", "activity", "notes", "duration_minutes", "order")
+    raw_id_fields = ("location", "activity")
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("location", "activity")
+
+
+class PlanSectionInline(admin.TabularInline):
+    model = models.PlanSection
+    extra = 0
+    fields = ("name", "order")
+    show_change_link = True  # Allows clicking through to edit section items
+
+
+class PlanAdmin(TeamOwnedAdmin):
+    list_display = (
+        "venue",
+        "session_date",
+        "session_time",
+        "group_size",
+        "ability_level",
+        "coaches_required",
+        "coach_qualification_required",
+        "owner_team",
+    )
+    list_filter = (
+        "venue",
+        "ability_level",
+        "session_date",
+        "coach_qualification_required",
+        "owner_team",
+    )
+    search_fields = ("venue__name", "plan_goal")
+    inlines = [PlanSectionInline]
+    date_hierarchy = "session_date"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("venue")
+
+
+class PlanSectionAdmin(admin.ModelAdmin):
+    list_display = ("name", "plan", "order")
+    list_filter = ("plan__venue", "plan__session_date")
+    search_fields = ("name", "plan__venue__name")
+    inlines = [PlanSectionItemInline]
+    ordering = ["plan", "order"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("plan", "plan__venue")
+
+
 # Register models with safe AlreadyRegistered handling (use admin classes where defined)
 for model, admin_class in (
     (models.Venue, VenueAdmin),
@@ -173,6 +227,8 @@ for model, admin_class in (
     (models.ActivityEquipment, ActivityEquipmentAdmin),
     (models.Team, TeamAdmin),
     (models.TeamMembership, TeamMembershipAdmin),
+    (models.Plan, PlanAdmin),
+    (models.PlanSection, PlanSectionAdmin),
 ):
     try:
         if admin_class:

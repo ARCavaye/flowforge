@@ -297,3 +297,198 @@ class ActivityEquipment(TeamOwnedMixin, models.Model):
         return (
             f"{self.quantity_needed} x {self.equipment.name} for {self.activity.name}"
         )
+
+
+class Plan(TeamOwnedMixin, models.Model):
+    ABILITY_BEGINNER = "beginner"
+    ABILITY_INTERMEDIATE = "intermediate"
+    ABILITY_ADVANCED = "advanced"
+    ABILITY_MIXED = "mixed"
+
+    ABILITY_CHOICES = [
+        (ABILITY_BEGINNER, "Beginner"),
+        (ABILITY_INTERMEDIATE, "Intermediate"),
+        (ABILITY_ADVANCED, "Advanced"),
+        (ABILITY_MIXED, "Mixed Abilities"),
+    ]
+
+    venue = models.ForeignKey(
+        Venue,
+        on_delete=models.PROTECT,
+        verbose_name="Venue",
+        help_text="Where the session will take place",
+    )
+    session_date = models.DateField(
+        verbose_name="Session Date", help_text="Date of the planned session"
+    )
+    session_time = models.TimeField(
+        verbose_name="Session Time", help_text="Start time of the session"
+    )
+    session_length_minutes = models.PositiveIntegerField(
+        verbose_name="Session Length", help_text="Duration of the session in minutes"
+    )
+    group_size = models.PositiveIntegerField(
+        verbose_name="Group Size", help_text="Expected number of participants"
+    )
+    age_range = models.CharField(
+        max_length=50,
+        verbose_name="Age Range",
+        help_text="Age range of participants (e.g., '8-10', '14+', 'Adult')",
+    )
+    ability_level = models.CharField(
+        max_length=20,
+        choices=ABILITY_CHOICES,
+        default=ABILITY_MIXED,
+        verbose_name="Ability Level",
+        help_text="Overall ability level of the group",
+    )
+    coaches_required = models.PositiveIntegerField(
+        verbose_name="Coaches Required",
+        help_text="Number of coaches needed for this session",
+        default=1,
+    )
+    # Coach qualification choices (machine-friendly keys stored in DB)
+    COACH_QUALIFICATION_CHOICES = [
+        ("i2c_bmx_freestyle", "I2C BMX Freestyle"),
+        ("i2c_bmx_race", "I2C BMX Race"),
+        ("i2c_cycle_speedway", "I2C Cycle Speedway"),
+        ("i2c_cycling", "I2C Cycling"),
+        ("i2c_off_road", "I2C Off-Road"),
+        ("i2c_road", "I2C Road"),
+        ("i2c_track", "I2C Track"),
+        ("cic_bmx_freestyle", "CIC BMX Freestyle"),
+        ("cic_bmx_race", "CIC BMX Race"),
+        ("cic_cx", "CIC CX"),
+        ("cic_mtb_xc", "CIC MTB XC"),
+        ("cic_mtb_gravity", "CIC MTB Gravity"),
+        ("cic_road", "CIC Road"),
+        ("cic_track", "CIC Track"),
+    ]
+
+    coach_qualification_required = models.CharField(
+        max_length=50,
+        choices=COACH_QUALIFICATION_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Coach Qualification Level Required",
+        help_text="Required coach qualification for this session (optional)",
+    )
+    plan_goal = models.TextField(
+        verbose_name="Session Goal", help_text="Main objective or goal for this session"
+    )
+
+    def __str__(self):
+        return (
+            f"Plan for {self.venue.name} on {self.session_date} at {self.session_time}"
+        )
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new:
+            # Create default sections if this is a new plan
+            sections = ["Start", "Middle", "End"]
+            for i, name in enumerate(sections):
+                PlanSection.objects.create(plan=self, name=name, order=i)
+
+
+class PlanSection(models.Model):
+    plan = models.ForeignKey(
+        Plan, on_delete=models.CASCADE, related_name="sections", verbose_name="Plan"
+    )
+    name = models.CharField(
+        max_length=100,
+        verbose_name="Section Name",
+        help_text="Name of this section (e.g., 'Warm-up', 'Main Activity', 'Cool Down')",
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Order",
+        help_text="Order in which this section appears in the plan",
+    )
+
+    class Meta:
+        ordering = ["order"]
+        unique_together = ["plan", "order"]
+
+    def __str__(self):
+        return f"{self.name} - {self.plan}"
+
+
+class PlanSectionItem(models.Model):
+    ITEM_TYPE_LOCATION = "location"
+    ITEM_TYPE_ACTIVITY = "activity"
+    ITEM_TYPE_NOTE = "note"
+
+    ITEM_TYPE_CHOICES = [
+        (ITEM_TYPE_LOCATION, "Location"),
+        (ITEM_TYPE_ACTIVITY, "Activity"),
+        (ITEM_TYPE_NOTE, "Note"),
+    ]
+
+    section = models.ForeignKey(
+        PlanSection,
+        on_delete=models.CASCADE,
+        related_name="items",
+        verbose_name="Section",
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        verbose_name="Order",
+        help_text="Order in which this item appears in the section",
+    )
+    item_type = models.CharField(
+        max_length=20, choices=ITEM_TYPE_CHOICES, verbose_name="Item Type"
+    )
+    location = models.ForeignKey(
+        Location,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Location",
+    )
+    activity = models.ForeignKey(
+        Activity,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Activity",
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name="Notes",
+        help_text="Additional notes or free-form content for this item",
+    )
+    duration_minutes = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Duration",
+        help_text="Optional duration for this item in minutes",
+    )
+
+    class Meta:
+        ordering = ["order"]
+        unique_together = ["section", "order"]
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        # Ensure only one of location/activity is set based on item_type
+        if self.item_type == self.ITEM_TYPE_LOCATION and not self.location:
+            raise ValidationError(
+                {"location": "Location is required for location type items"}
+            )
+        if self.item_type == self.ITEM_TYPE_ACTIVITY and not self.activity:
+            raise ValidationError(
+                {"activity": "Activity is required for activity type items"}
+            )
+        if self.item_type == self.ITEM_TYPE_NOTE and not self.notes:
+            raise ValidationError({"notes": "Notes are required for note type items"})
+
+    def __str__(self):
+        if self.item_type == self.ITEM_TYPE_LOCATION:
+            return f"Location: {self.location}"
+        elif self.item_type == self.ITEM_TYPE_ACTIVITY:
+            return f"Activity: {self.activity}"
+        else:
+            return f"Note: {self.notes[:50]}..."
