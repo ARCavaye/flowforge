@@ -3,8 +3,91 @@ from django.core import validators
 
 # Create your models here.
 
+from django.conf import settings
 
-class Venue(models.Model):
+
+# Team + membership models
+class Team(models.Model):
+    name = models.CharField(
+        max_length=150, unique=True, help_text="Team name", verbose_name="Team Name"
+    )
+    description = models.TextField(
+        blank=True, help_text="Description of the team", verbose_name="Team Description"
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class TeamMembership(models.Model):
+    ROLE_SESSION_LEADER = "leader"
+    ROLE_SESSION_PLANNER = "planner"
+    ROLE_TEAM_MANAGER = "manager"
+
+    ROLE_CHOICES = (
+        (ROLE_SESSION_LEADER, "Session Leader"),
+        (ROLE_SESSION_PLANNER, "Session Planner"),
+        (ROLE_TEAM_MANAGER, "Team Manager"),
+    )
+
+    team = models.ForeignKey(
+        Team, on_delete=models.CASCADE, related_name="memberships", verbose_name="Team"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="team_memberships",
+        verbose_name="User",
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default=ROLE_SESSION_LEADER,
+        verbose_name="Role",
+    )
+
+    class Meta:
+        unique_together = ("team", "user")
+
+    def can_read(self):
+        return True
+
+    def can_write(self):
+        return self.role in (self.ROLE_SESSION_PLANNER, self.ROLE_TEAM_MANAGER)
+
+    def can_manage(self):
+        return self.role == self.ROLE_TEAM_MANAGER
+
+    def __str__(self):
+        return f"{self.user} as {self.get_role_display()} on {self.team}"
+
+
+class TeamOwnedMixin(models.Model):
+    owner_team = models.ForeignKey(
+        Team,
+        verbose_name="Owner Team",
+        help_text="Team that owns this object",
+        related_name="%(app_label)s_%(class)s_owned_objects",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        abstract = True
+
+    def is_team_owner(self, team_or_id):
+        if not team_or_id:
+            return False
+        try:
+            tid = team_or_id.id if hasattr(team_or_id, "id") else int(team_or_id)
+        except Exception:
+            return False
+        return self.owner_team_id == tid
+
+
+# Domain models
+class Venue(TeamOwnedMixin, models.Model):
     name = models.CharField(
         max_length=100,
         blank=False,
@@ -42,7 +125,7 @@ class Venue(models.Model):
         return self.name
 
 
-class Location(models.Model):
+class Location(TeamOwnedMixin, models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE, verbose_name="Venue")
     name = models.CharField(
         max_length=100,
@@ -85,7 +168,7 @@ class Location(models.Model):
         return f"{self.name} at {self.venue.name}"
 
 
-class LocationImage(models.Model):
+class LocationImage(TeamOwnedMixin, models.Model):
     location = models.ForeignKey(
         Location, on_delete=models.CASCADE, verbose_name="Location"
     )
@@ -101,7 +184,7 @@ class LocationImage(models.Model):
         return f"Image for {self.location.name}"
 
 
-class Activity(models.Model):
+class Activity(TeamOwnedMixin, models.Model):
     name = models.CharField(
         max_length=100,
         blank=False,
@@ -142,7 +225,7 @@ class Activity(models.Model):
         return f"{self.name}"
 
 
-class ActivityImage(models.Model):
+class ActivityImage(TeamOwnedMixin, models.Model):
     activity = models.ForeignKey(
         Activity, on_delete=models.CASCADE, verbose_name="Activity"
     )
@@ -160,7 +243,7 @@ class ActivityImage(models.Model):
         return f"Image for {self.activity.name}"
 
 
-class Equipment(models.Model):
+class Equipment(TeamOwnedMixin, models.Model):
     name = models.CharField(
         max_length=100,
         blank=False,
@@ -184,8 +267,8 @@ class Equipment(models.Model):
         verbose_name="Safety Instructions",
     )
     activities = models.ManyToManyField(
-        "activity",
-        through="activityEquipment",
+        "Activity",
+        through="ActivityEquipment",
         related_name="equipment_items",
         verbose_name="Activities",
     )
@@ -194,7 +277,7 @@ class Equipment(models.Model):
         return f"{self.name}"
 
 
-class ActivityEquipment(models.Model):
+class ActivityEquipment(TeamOwnedMixin, models.Model):
     activity = models.ForeignKey(
         Activity, on_delete=models.CASCADE, verbose_name="Activity"
     )
