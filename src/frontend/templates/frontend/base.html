@@ -1,9 +1,28 @@
+{% load static %}
 <html>
     <head>
-        <title>{% block title %}My Website{% endblock %}</title>
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <title>{% block title %}Flowforge{% endblock %}</title>
+        
+        <!-- Favicons -->
+        <!-- PNG versions -->
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'frontend/favicons/favicon-16x16.png' %}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'frontend/favicons/favicon-32x32.png' %}">
+        <!-- Apple Touch Icon -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'frontend/favicons/favicon-180x180.png' %}">
+
     </head>
     <body>
-        <h1>Flowforge</h1>
+        {% block navbar %}
+        {% endblock %}
+        
+        {% block content %}
+        {% endblock %}
+
+        {% block footer %}
+        {% endblock %}
     </body>
 </html>
