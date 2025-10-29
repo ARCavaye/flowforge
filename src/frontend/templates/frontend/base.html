@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <title>{% block title %}Flowforge{% endblock %}</title>
-        
+
         <!-- Favicons -->
         <!-- PNG versions -->
         <link rel="icon" type="image/png" sizes="16x16" href="{% static 'frontend/favicons/favicon-16x16.png' %}">
@@ -17,18 +17,52 @@
         <!-- Bulma -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
 
+        <!-- jQuery -->
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
     </head>
     <body>
         {% block navbar %}
         <nav class="navbar" role="navigation" aria-label="main navigation">
             <div class="navbar-brand">
-                <a class="navbar-item" href="/">
+                <a class="navbar-item" href="{% url 'frontend:plan_detail' 1 %}">
                     <img src="{% static 'frontend/logos/Flowforge-logo-horizontal-colour.png' %}" alt="Flowforge Logo">
                 </a>
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu">
+                <div class="navbar-start">
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                        Teams
+                        </a>
+
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item">
+                                Team 1
+                            </a>
+
+                            <a class="navbar-item">
+                                Team 2
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navbar-end">
+                    <a class="navbar-item">
+                        Logout
+                    </a>
+                </div>
             </div>
         </nav>
         {% endblock %}
-        
+
         {% block content %}
         {% endblock %}
 
@@ -36,3 +70,17 @@
         {% endblock %}
     </body>
 </html>
+
+<script>
+    $(document).ready(function() {
+
+        // Check for click events on the navbar burger icon
+        $(".navbar-burger").click(function() {
+
+            // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+            $(".navbar-burger").toggleClass("is-active");
+            $(".navbar-menu").toggleClass("is-active");
+
+        });
+    });
+</script>
