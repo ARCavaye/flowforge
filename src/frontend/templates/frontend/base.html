@@ -14,9 +14,19 @@
         <!-- Apple Touch Icon -->
         <link rel="apple-touch-icon" sizes="180x180" href="{% static 'frontend/favicons/favicon-180x180.png' %}">
 
+        <!-- Bulma -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+
     </head>
     <body>
         {% block navbar %}
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="/">
+                    <img src="{% static 'frontend/logos/Flowforge-logo-horizontal-colour.png' %}" alt="Flowforge Logo">
+                </a>
+            </div>
+        </nav>
         {% endblock %}
         
         {% block content %}

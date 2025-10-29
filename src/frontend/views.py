@@ -1,5 +1,7 @@
 from django.core.exceptions import PermissionDenied
-from core.models import TeamMembership
+from core.models import TeamMembership, Plan
+from django.views.generic import DetailView
+
 
 
 class TeamOwnershipMixin:
@@ -42,3 +44,7 @@ class TeamOwnershipMixin:
             return qs
         team_ids = request.user.team_memberships.values_list("team", flat=True)
         return qs.filter(owner_team__in=team_ids).distinct()
+
+class PlanDetailView(TeamOwnershipMixin,DetailView):
+    model = Plan
+    template_name = "frontend/plan_detail.html"
