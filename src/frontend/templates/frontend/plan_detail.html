@@ -3,8 +3,14 @@
 {% block title %}{{ plan }}{% endblock %}
 
 {% block content %}
-
-<h1>{{ plan }}</h1>
-
+<section class="section">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="#">{{ plan.owner_team.name }}</a></li>
+            <li><a href="#">Plans</a></li>
+            <li class="is-active"><a href="#" aria-current="page">{{ plan }}</a></li>
+        </ul>
+    </nav>
+</section>
 
 {% endblock %}
