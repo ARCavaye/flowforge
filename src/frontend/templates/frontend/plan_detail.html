@@ -1,16 +1,71 @@
-{% extends "frontend/base.html" %}
-
-{% block title %}{{ plan }}{% endblock %}
-
+{% extends "frontend/base.html" %} {% block title %}{{ plan }}{% endblock %}
 {% block content %}
-<section class="section">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-        <ul>
-            <li><a href="#">{{ plan.owner_team.name }}</a></li>
-            <li><a href="#">Plans</a></li>
-            <li class="is-active"><a href="#" aria-current="page">{{ plan }}</a></li>
-        </ul>
-    </nav>
-</section>
+<div class="container-fluid overflow-auto">
+  <div class="row flex-column flex-lg-row flex-lg-nowrap">
+    <div class="col-12 col-lg p-3" style="min-width: 300px">
+      <div class="card w-100 h-100">
+        <div class="card-header">Beginning</div>
+        <div class="card-body">
+            <!-- Column 1 contents -->
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="..." class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">Move to Location</h5>
+                            <p class="card-text">Big Rocky Bit</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg p-3" style="min-width: 300px">
+      <div class="card w-100 h-100">
+        <div class="card-header">Middle</div>
+        <div class="card-body">
+            <!-- Column 2 contents -->
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="..." class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">Activity</h5>
+                            <p class="card-text">Descending Rocky Bits</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg p-3" style="min-width: 300px">
+      <div class="card w-100 h-100">
+        <div class="card-header">End</div>
+        <div class="card-body">
+            <!-- Column 3 contents -->
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="..." class="img-fluid rounded-start" alt="...">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">Move to Location</h5>
+                            <p class="card-text">Car Park</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
